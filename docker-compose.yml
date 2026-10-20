@@ -8,6 +8,7 @@ services:
       - go2rtc-config:/config
 
   app:
+    image: ${APP_IMAGE:-}
     build:
       context: .
       dockerfile: Dockerfile
