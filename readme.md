@@ -28,12 +28,30 @@ docker compose up -d --build
 
 ### Dockhand
 
-1. Nieuwe stack → **Git repository** → `https://github.com/s4ndyp/onvif-explorer`
-2. Compose-pad: `docker-compose.yml`
-3. Omgevingsvariabelen instellen:
-   - `GO2RTC_PUBLIC_URL` — publieke URL van go2rtc (zelfde host/IP als de gebruiker in de browser, poort **1984**)
-   - Optioneel: `APP_PORT`, `GO2RTC_PORT`
-4. Deploy / Pull & redeploy
+**Optie A — voorgebouwde image (aanbevolen)**
+
+GitHub Actions bouwt bij elke push naar `main` de container en pusht naar **GHCR** (`ghcr.io/s4ndyp/onvif-explorer:latest`).
+
+1. Zorg dat de workflow **Build Docker image** op `main` groen is (tab Actions).
+2. Dockhand stack → Git repo → compose-bestand: **`docker-compose.ghcr.yml`**
+3. Omgeving:
+   - `GO2RTC_PUBLIC_URL` — URL van go2rtc voor de browser (poort **1984**)
+   - Optioneel: `APP_IMAGE` (default `ghcr.io/s4ndyp/onvif-explorer:latest`), `APP_PORT`, `GO2RTC_PORT`
+4. Als GHCR privaat is: in Dockhand registry-login voor `ghcr.io` met een GitHub PAT (`read:packages`).
+
+**Optie B — build op de host**
+
+Compose-pad: **`docker-compose.yml`** → `docker compose up -d --build` (of Dockhand “build” ingeschakeld).
+
+### CI / Docker build
+
+Workflow: [`.github/workflows/docker-build.yml`](.github/workflows/docker-build.yml)
+
+- **Pull requests**: alleen build (validatie), geen push
+- **Push naar `main`** / tags `v*`: build + push naar GHCR
+- **Handmatig**: Actions → *Build Docker image* → *Run workflow*
+
+Repository variable (optioneel): `GO2RTC_PUBLIC_URL` — wordt als build-arg meegegeven.
 
 ## Netwerkscan in Docker
 
