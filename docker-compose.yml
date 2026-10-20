@@ -1,0 +1,30 @@
+services:
+  go2rtc:
+    image: alexxit/go2rtc:latest
+    restart: unless-stopped
+    ports:
+      - "${GO2RTC_PORT:-1984}:1984"
+    volumes:
+      - go2rtc-config:/config
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_GO2RTC_PUBLIC_URL: ${GO2RTC_PUBLIC_URL:-http://localhost:1984}
+    restart: unless-stopped
+    depends_on:
+      - go2rtc
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      PORT: "8080"
+      GO2RTC_INTERNAL_URL: http://go2rtc:1984
+      GO2RTC_PUBLIC_URL: ${GO2RTC_PUBLIC_URL:-http://localhost:1984}
+    # Voor WS-Discovery (multicast UDP 3702) op het LAN: uncomment host network.
+    # Let op: met host network moet GO2RTC_PUBLIC_URL naar het host-IP wijzen.
+    # network_mode: host
+
+volumes:
+  go2rtc-config:
