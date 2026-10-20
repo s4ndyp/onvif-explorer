@@ -8,7 +8,6 @@ services:
       - go2rtc-config:/config
 
   app:
-    image: ${APP_IMAGE:-}
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,13 +17,14 @@ services:
     depends_on:
       - go2rtc
     ports:
+      # Alleen APP_PORT aanpassen (extern). In de container blijft de app op 8080.
       - "${APP_PORT:-8080}:8080"
     environment:
-      PORT: "8080"
+      APP_PORT: ${APP_PORT:-8080}
+      HOST_NETWORK: "false"
       GO2RTC_INTERNAL_URL: http://go2rtc:1984
       GO2RTC_PUBLIC_URL: ${GO2RTC_PUBLIC_URL:-http://localhost:1984}
-    # Voor WS-Discovery (multicast UDP 3702) op het LAN: uncomment host network.
-    # Let op: met host network moet GO2RTC_PUBLIC_URL naar het host-IP wijzen.
+    # WS-Discovery (multicast): host network + HOST_NETWORK=true + APP_PORT=<poort>
     # network_mode: host
 
 volumes:

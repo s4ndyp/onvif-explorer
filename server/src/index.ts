@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url";
 import {
   closeSession,
   connectDevice,
-  getCachedDevice,
   getSession,
   getStreamUriForProfile,
   registerManualDevice,
@@ -185,5 +184,14 @@ app.get("*", (req, res, next) => {
 });
 
 app.listen(port, "0.0.0.0", () => {
+  if (
+    port !== 8080 &&
+    process.env.HOST_NETWORK !== "true" &&
+    process.env.HOST_NETWORK !== "1"
+  ) {
+    console.warn(
+      `ONVIF Explorer luistert op poort ${port}. In Docker hoort dit 8080 te zijn; gebruik APP_PORT voor de externe poort.`,
+    );
+  }
   console.log(`ONVIF Explorer luistert op http://0.0.0.0:${port}`);
 });

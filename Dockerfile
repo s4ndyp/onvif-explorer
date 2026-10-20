@@ -24,6 +24,8 @@ COPY server/package.json server/package-lock.json* ./
 RUN npm install --omit=dev
 COPY --from=server-build /app/server/dist ./dist
 COPY --from=client-build /app/client/dist ./public
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 EXPOSE 8080
 USER node
-CMD ["node", "dist/index.js"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

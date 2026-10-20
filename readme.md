@@ -23,8 +23,20 @@ export GO2RTC_PUBLIC_URL=http://192.168.1.10:1984
 docker compose up -d --build
 ```
 
-- Web-UI: `http://<host>:8080`
+- Web-UI: `http://<host>:8080` (of `:APP_PORT` als je die hebt gewijzigd)
 - go2rtc UI: `http://<host>:1984`
+
+### Andere poort dan 8080 (bijv. 8888)
+
+In Docker luistert de app **altijd op poort 8080 inside** de container. Alleen de **host-poort** pas je aan:
+
+```bash
+APP_PORT=8888 docker compose up -d
+```
+
+Open daarna **`http://10.5.0.103:8888`** (niet `:8080`).
+
+**Veelgemaakte fout:** `PORT=8888` in Dockhand/compose zetten. Dan luistert de app op 8888 *in* de container, maar Docker stuurt verkeer naar **8080** → `ERR_CONNECTION_REFUSED`. Gebruik **`APP_PORT=8888`** en verwijder een custom **`PORT`** uit je omgeving.
 
 ### Dockhand
 
@@ -83,7 +95,9 @@ Open Vite op `http://localhost:5173` (proxy naar API op 8080).
 
 | Variabele | Default | Beschrijving |
 |-----------|---------|--------------|
-| `PORT` | `8080` | HTTP-poort van de app |
+| `APP_PORT` | `8080` | **Host-poort** (browser). Container blijft op 8080 |
+| `PORT` | `8080` | Alleen voor lokale dev; in Docker door entrypoint geforceerd op 8080 |
+| `HOST_NETWORK` | `false` | `true` bij `network_mode: host`; luistert dan op `APP_PORT` |
 | `GO2RTC_INTERNAL_URL` | `http://go2rtc:1984` | go2rtc vanuit de app-container |
 | `GO2RTC_PUBLIC_URL` | `http://localhost:1984` | URL die de browser gebruikt voor video |
 
